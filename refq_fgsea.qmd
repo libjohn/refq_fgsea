@@ -166,7 +166,8 @@ to_plot_df |>
 ## Plot rankings
 
 ```{r}
-#| eval: false
+#: eval: false
+
 
 enframe(my_rank_vector) |> 
   ggplot(aes(x = reorder(name, value), y = value)) +
@@ -185,6 +186,7 @@ enframe(my_rank_vector) |>
 ```{r}
 #| eval: false
 
+
 enframe(my_rank_vector) |> 
   slice_head(n = 50) |> 
   ggplot(aes(name, value)) + 
@@ -194,6 +196,16 @@ enframe(my_rank_vector) |>
   labs(x = "Index/Gene Symbol", y = "Ranking")
 ```
 
+## fgsea
+
+```{r}
+#| eval: false
+
+
+my_fgsea_df <- fgsea(pathways = my_pathways_list,
+      stats = my_rank_vector)
+my_fgsea_df
+```
 
 
 
