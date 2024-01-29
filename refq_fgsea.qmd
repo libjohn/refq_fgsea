@@ -163,6 +163,37 @@ to_plot_df |>
 ```
 
 
+## Plot rankings
+
+```{r}
+#| eval: false
+
+enframe(my_rank_vector) |> 
+  ggplot(aes(x = reorder(name, value), y = value)) +
+  geom_point() +
+  coord_flip() +
+  labs(x = "Index/Gene Symbol", y = "Ranking")
+
+enframe(my_rank_vector) |> 
+  ggplot(aes(x = reorder(name, value), y = value)) +
+  geom_point() +
+  labs(x = "Index/Gene Symbol", y = "Ranking")
+
+ 
+```
+
+```{r}
+#| eval: false
+
+enframe(my_rank_vector) |> 
+  slice_head(n = 50) |> 
+  ggplot(aes(name, value)) + 
+	geom_point() +
+	theme_classic() + 
+	theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) +
+  labs(x = "Index/Gene Symbol", y = "Ranking")
+```
+
 
 
 
