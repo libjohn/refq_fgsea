@@ -1,0 +1,168 @@
+---
+title: "refq_fgsea"
+
+editor: source
+---
+
+Tidying {[fgsea](https://bioconductor.org/packages/release/bioc/vignettes/fgsea/inst/doc/fgsea-tutorial.html)} and [fgsea-tutorial](https://biostatsquid.com/fgsea-tutorial-gsea/)
+
+## Load library packages
+
+```{r}
+library(tidyverse)
+library(fgsea)
+```
+
+## Practice data
+
+The practice data consists of a named vector of ranks and a named list of pathways.  Put both into a tibble.
+
+```{r}
+foo_ep_df <- enframe(examplePathways) 
+
+foo_ep_df <- foo_ep_df |> 
+  mutate(my_ranks = list(exampleRanks))
+
+foo_ep_df
+```
+
+
+```{r}
+head(exampleRanks)
+```
+
+
+Test this out.  Using `fgsea::plotEnrichment()` make the example plot from the vignette.  First filter to the pathway of interest.
+
+```{r}
+# foo_ep_df |> 
+#   head(1)
+
+foo_ep_df |> 
+  filter(name == "5991130_Programmed_Cell_Death") 
+```
+
+Using map, practice iterating on one row for the pathway of interest.
+
+```{r}
+foo_ep_df |> 
+  filter(name == "5991130_Programmed_Cell_Death") |> 
+  mutate(my_plot = map2(value, my_ranks, \(x, y) 
+                        plotEnrichment(x, y))) |> 
+  pull(my_plot)
+```
+
+That works.  Now make an enrichment plot for several pathways.
+
+```{r}
+foo_ep_df |> 
+  # filter(name == "5991130_Programmed_Cell_Death") |> 
+  slice(21:26) |> 
+  mutate(my_plot = map2(value, my_ranks, \(x, y) 
+                        plotEnrichment(x, y))) |> 
+  pull(my_plot)
+```
+
+## Patron data
+
+Patron supplied ranking data.
+
+```{r}
+#| eval: false
+
+my_df <- read_csv("data/DGKazTregfgsea.csv", show_col_types = FALSE) |> 
+  janitor::clean_names() |> 
+  rename(gene_symbol = x1, rank_avg_log = avg_log2fc) |> 
+  mutate(gene_symbol = str_to_upper(gene_symbol))
+
+my_df
+```
+
+Coerce rankings into a named vector
+
+```{r}
+#| eval: false
+
+
+my_rank <- my_df |> 
+  drop_na(rank_avg_log) |> 
+  arrange(rank_avg_log)
+
+my_rank_vector <- my_rank |> 
+  pull(rank_avg_log)
+
+my_rank_names <- my_rank |> 
+  pull(gene_symbol)
+
+my_rank_vector <- setNames(my_rank_vector, my_rank_names)
+
+head(my_rank_vector)
+```
+
+## Prepare background set
+
+i.e. the `.gmt` file.  See the biosquid page for more discussion of background sets.  i.e. the pathways.  Remember the readr::read_table() function is vectorize.  This means the first argument can be a vector of .gmt files.  The function will read each one and return a list of tibbles.  For more discussion on iterating over multiple files, see the [Iterate Functions in R: tips and Tricks](https://www.youtube.com/watch?v=PrUnbYlC1kY&list=PLIUcX1JrVUNWW7RgPh9ysmJM3mBpIAlYG) playlist and [associated code](https://github.com/libjohn/workshop_rfun_iterate).
+
+```{r}
+#| eval: false
+
+
+my_gmt_file <- read_table("data/h.all.v2023.2.Hs.symbols.gmt", 
+                                       col_names = FALSE) |> 
+  janitor::clean_names() |> 
+  select(-x2)
+
+my_gmt_file
+```
+
+
+Create a named list of pathways with genes associated with each pathway.   Later these will get linked up with the rankings and stored in a tibble for iteration.
+
+```{r}
+#| eval: false
+
+# remove first column
+df_values <- my_gmt_file |> 
+  select(-x1)
+
+# Convert each row of the tibble to a vector and store them in a list
+my_pathways_list <- lapply(1:nrow(my_gmt_file), function(i) 
+  unname(unlist((my_gmt_file[i, -1])[!is.na(my_gmt_file[i, -1])])))
+
+# Assign names to the list elements
+names(my_pathways_list) <- my_gmt_file$x1
+
+head(my_pathways_list)
+```
+
+
+Now create a tibble consisting of the background pathways with associated gene symbols.  Combine that with the gene symbols in the rankings.
+
+```{r}
+#| eval: false
+
+enframe(my_pathways_list) |> 
+  head(1) |> 
+  unnest(value)
+
+
+to_plot_df <- enframe(my_pathways_list) |> 
+  mutate(my_ranks = list(my_rank_vector))
+to_plot_df
+```
+
+Now iterate to create all the enrichment plots, iterating the enrishment plot action seen in the {fgsea} vignette.
+
+```{r}
+#| eval: false
+
+to_plot_df |> 
+  mutate(my_plot = map2(value, my_ranks, \(x, y) 
+                        plotEnrichment(x, y))) |> 
+  pull(my_plot)
+```
+
+
+
+
+
