@@ -135,6 +135,33 @@ names(my_pathways_list) <- my_gmt_file$x1
 head(my_pathways_list)
 ```
 
+## all in one tidy bundle method
+
+make a list vector of the gene symbols for each pathway from the gmt file.  Add a named vector for rowwise iteration where the named vector consists of gene rankings.  Use map2 to iterate the plotting operation, i.e. `plotEnrichment`.
+
+```{r}
+#| eval: false
+
+my_enriched_plots_df <- my_gmt_file |> 
+  rename(pathways = x1) |> 
+  pivot_longer(x3:last_col(), values_to = "genes_in_pathway") |> 
+  drop_na(genes_in_pathway) |> 
+  group_by(pathways) |> 
+  summarise(gene_symbols = list(genes_in_pathway)) |> 
+  mutate(my_ranks = list(my_rank_vector)) |> 
+  mutate(my_plot = map2(gene_symbols, my_ranks, \(x, y) 
+                        plotEnrichment(x, y)))
+
+my_enriched_plots_df
+
+my_enriched_plots_df |> 
+  pull(my_plot)
+  
+```
+
+
+
+## step by step method
 
 Now create a tibble consisting of the background pathways with associated gene symbols.  Combine that with the gene symbols in the rankings.
 
