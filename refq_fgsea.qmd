@@ -170,6 +170,20 @@ my_enriched_plots_df
 
 my_enriched_plots_df |> 
   pull(my_plot)
+
+
+my_gmt_file |> 
+  rename(pathways = x1) |> 
+  pivot_longer(x3:last_col(), values_to = "genes_in_pathway") |> 
+  drop_na(genes_in_pathway) |> 
+  group_by(pathways) |> 
+  summarise(gene_symbols = list(genes_in_pathway)) |> 
+  mutate(my_ranks = list(my_rank_vector)) |> 
+  mutate(my_plot = pmap(list(gene_symbols, my_ranks, pathways), \(x, y, z) 
+                        plotEnrichment(x, y) +
+                          labs(title = z))) |> 
+  slice(7:12) |>
+  pull(my_plot)
   
 ```
 
