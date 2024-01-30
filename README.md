@@ -19,6 +19,9 @@ This annotated reproducible code uses the example data from the {fgsea} ([vignet
 
 ```{# basic outline below}
 
+library(tidyverse)
+library(fgsea)
+
 my_gmt_file <- read_table("data/my_symbols.gmt", 
                                        col_names = FALSE) |> 
   janitor::clean_names() |> 
