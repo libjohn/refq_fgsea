@@ -83,7 +83,6 @@ Coerce rankings into a named vector
 ```{r}
 #| eval: false
 
-
 my_rank <- my_df |> 
   drop_na(rank_avg_log) |> 
   arrange(rank_avg_log)
@@ -138,6 +137,22 @@ head(my_pathways_list)
 ## all in one tidy bundle method
 
 make a list vector of the gene symbols for each pathway from the gmt file.  Add a named vector for rowwise iteration where the named vector consists of gene rankings.  Use map2 to iterate the plotting operation, i.e. `plotEnrichment`.
+
+```{r}
+#| eval: false
+
+my_rank_vector <- my_df |> 
+  drop_na(rank_avg_log) |>
+  arrange(rank_avg_log) |> 
+  select(gene_symbol, rank_avg_log) |> 
+  summarise(my_ranked_vector = list(setNames(rank_avg_log, gene_symbol))) |> 
+  pull(my_ranked_vector) |> 
+  unlist()
+
+my_rank_vector |> head()
+
+
+```
 
 ```{r}
 #| eval: false
