@@ -17,7 +17,9 @@ This annotated reproducible code uses the example data from the {fgsea} ([vignet
     4.  Add a list column as a named-vector of rankings from a separate computation
     5.  iterate rowwise (via `map2()` ) to create plots via `fgsea::plotEnrichment()`
 
-```{my_gmt_file <- read_table("data/my_symbols.gmt",}
+```{# basic outline below}
+
+my_gmt_file <- read_table("data/my_symbols.gmt", 
                                        col_names = FALSE) |> 
   janitor::clean_names() |> 
   select(-x2) 
