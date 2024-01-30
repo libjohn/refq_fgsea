@@ -34,7 +34,7 @@ my_rank_vector <- my_df |>
   pull(my_ranked_vector) |> 
   unlist()
 
-my_rank_vector |> unlist() |> head()
+my_rank_vector |> head()
 
 my_enriched_plots_df <- my_gmt_file |> 
   rename(pathways = x1) |> 
