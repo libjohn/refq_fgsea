@@ -31,7 +31,6 @@ my_df <- read_csv("data/my_model_ranking.csv", show_col_types = FALSE) |>
 my_rank_vector <- my_df |> 
   drop_na(rank_avg_log) |>
   arrange(rank_avg_log) |> 
-  select(gene_symbol, rank_avg_log) |> 
   summarise(my_ranked_vector = list(setNames(rank_avg_log, gene_symbol))) |> 
   pull(my_ranked_vector) |> 
   unlist()

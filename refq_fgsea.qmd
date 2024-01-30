@@ -144,7 +144,6 @@ make a list vector of the gene symbols for each pathway from the gmt file.  Add 
 my_rank_vector <- my_df |> 
   drop_na(rank_avg_log) |>
   arrange(rank_avg_log) |> 
-  select(gene_symbol, rank_avg_log) |> 
   summarise(my_ranked_vector = list(setNames(rank_avg_log, gene_symbol))) |> 
   pull(my_ranked_vector) |> 
   unlist()
